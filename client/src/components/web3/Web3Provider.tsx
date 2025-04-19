@@ -1,97 +1,103 @@
-import { createContext, useEffect, useState, ReactNode } from 'react';
-import { ethers } from 'ethers';
-import { NETWORK_PARAMS } from '@/lib/constants';
+import React, { ReactNode, createContext, useState } from 'react';
+import { WagmiConfig, createConfig } from 'wagmi';
+import { http } from 'viem';
+import { mainnet, arbitrum, optimism, polygon, sepolia } from 'viem/chains';
+import { injected, metaMask, walletConnect } from '@wagmi/connectors';
 
-interface Web3ContextType {
-  provider: ethers.providers.Web3Provider | null;
-  signer: ethers.Signer | null;
-  network: {
+// Define a custom chain interface
+export interface CustomChain {
+  id: number;
+  name: string;
+  network: string;
+  nativeCurrency: {
     name: string;
-    chainId: number;
-  } | null;
-  isConnecting: boolean;
-  error: Error | null;
+    symbol: string;
+    decimals: number;
+  };
+  rpcUrls: {
+    default: {
+      http: string[];
+    };
+    public: {
+      http: string[];
+    };
+  };
+  blockExplorers?: {
+    default: {
+      name: string;
+      url: string;
+    };
+  };
 }
 
-export const Web3Context = createContext<Web3ContextType>({
-  provider: null,
-  signer: null,
-  network: null,
-  isConnecting: false,
-  error: null,
+// Create a context for managing custom chains
+interface CustomChainContextProps {
+  customChains: CustomChain[];
+  addCustomChain: (chain: CustomChain) => void;
+  removeCustomChain: (chainId: number) => void;
+}
+
+export const CustomChainContext = createContext<CustomChainContextProps>({
+  customChains: [],
+  addCustomChain: () => {},
+  removeCustomChain: () => {},
 });
+
+// We'll create the config inside the component so we can use the projectId prop
+function createWagmiConfig(projectId?: string) {
+  return createConfig({
+    chains: [mainnet, arbitrum, optimism, polygon, sepolia],
+    transports: {
+      [mainnet.id]: http(),
+      [arbitrum.id]: http(),
+      [optimism.id]: http(),
+      [polygon.id]: http(),
+      [sepolia.id]: http(),
+    },
+    connectors: [
+      injected({
+        // shimDisconnect is not available in this version
+      }),
+      metaMask({
+        // shimDisconnect is not available in this version
+      }),
+      walletConnect({
+        projectId: projectId || import.meta.env.WALLET_CONNECT_PROJECT_ID,
+        showQrModal: true,
+      }),
+    ],
+  });
+}
 
 interface Web3ProviderProps {
   children: ReactNode;
+  projectId?: string;
 }
 
-export function Web3Provider({ children }: Web3ProviderProps) {
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
-  const [signer, setSigner] = useState<ethers.Signer | null>(null);
-  const [network, setNetwork] = useState<{ name: string; chainId: number } | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+export function Web3Provider({ children, projectId }: Web3ProviderProps) {
+  const [customChains, setCustomChains] = useState<CustomChain[]>([]);
+  const [config] = useState(() => createWagmiConfig(projectId));
 
-  // Initialize provider if window.ethereum is available
-  useEffect(() => {
-    const initProvider = async () => {
-      if (typeof window !== 'undefined' && window.ethereum) {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-          const network = await provider.getNetwork();
-          const networkInfo = {
-            name: NETWORK_PARAMS[network.chainId]?.chainName || network.name,
-            chainId: network.chainId
-          };
-          
-          setProvider(provider);
-          setNetwork(networkInfo);
-        } catch (err) {
-          console.error('Failed to initialize web3 provider:', err);
-          setError(err instanceof Error ? err : new Error(String(err)));
-        }
+  // Add a custom chain
+  const addCustomChain = (chain: CustomChain) => {
+    setCustomChains(prev => {
+      if (prev.some(c => c.id === chain.id)) {
+        return prev;
       }
-    };
+      return [...prev, chain];
+    });
+  };
 
-    initProvider();
-  }, []);
-
-  // Set up event listeners for account and chain changes
-  useEffect(() => {
-    if (window.ethereum) {
-      const handleAccountsChanged = async (accounts: string[]) => {
-        if (accounts.length > 0 && provider) {
-          setSigner(provider.getSigner());
-        } else {
-          setSigner(null);
-        }
-      };
-
-      const handleChainChanged = () => {
-        window.location.reload();
-      };
-
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      window.ethereum.on('chainChanged', handleChainChanged);
-
-      return () => {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-        window.ethereum.removeListener('chainChanged', handleChainChanged);
-      };
-    }
-  }, [provider]);
+  // Remove a custom chain
+  const removeCustomChain = (chainId: number) => {
+    setCustomChains(prev => prev.filter(chain => chain.id !== chainId));
+  };
 
   return (
-    <Web3Context.Provider
-      value={{
-        provider,
-        signer,
-        network,
-        isConnecting,
-        error,
-      }}
-    >
-      {children}
-    </Web3Context.Provider>
+    <CustomChainContext.Provider value={{ customChains, addCustomChain, removeCustomChain }}>
+      <WagmiConfig config={config}>
+        {children}
+      </WagmiConfig>
+    </CustomChainContext.Provider>
   );
 }

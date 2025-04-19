@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { Web3Provider } from "@/components/web3/Web3Provider.simple";
 import Dashboard from "@/pages/Dashboard";
 import Pools from "@/pages/Pools";
 import Swap from "@/pages/Swap";
@@ -38,17 +39,19 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="flex flex-col h-screen bg-gray-50">
-          <Header toggleMobileMenu={toggleMobileMenu} />
-          {isMobileMenuOpen && <MobileMenu />}
-          <main className="flex-1 overflow-y-auto">
-            <Router />
-          </main>
-          <Footer />
-          <Toaster />
-        </div>
-      </TooltipProvider>
+      <Web3Provider>
+        <TooltipProvider>
+          <div className="flex flex-col h-screen bg-gray-50">
+            <Header toggleMobileMenu={toggleMobileMenu} />
+            {isMobileMenuOpen && <MobileMenu />}
+            <main className="flex-1 overflow-y-auto">
+              <Router />
+            </main>
+            <Footer />
+            <Toaster />
+          </div>
+        </TooltipProvider>
+      </Web3Provider>
     </QueryClientProvider>
   );
 }

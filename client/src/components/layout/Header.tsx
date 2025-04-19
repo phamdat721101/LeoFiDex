@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useWallet } from "@/hooks/useWallet";
 import { Button } from "@/components/ui/button";
-import { WalletConnect } from "@/components/web3/WalletConnect";
+import { ConnectWallet } from "@/components/web3/ConnectWallet";
 import { LeoFiLogo } from "@/lib/leofi-logo";
 
 interface HeaderProps {
@@ -11,29 +10,6 @@ interface HeaderProps {
 
 export function Header({ toggleMobileMenu }: HeaderProps) {
   const [location] = useLocation();
-  const { address } = useWallet();
-  const [showWalletModal, setShowWalletModal] = useState(false);
-
-  const openWalletModal = () => {
-    setShowWalletModal(true);
-  };
-
-  const closeWalletModal = () => {
-    setShowWalletModal(false);
-  };
-
-  useEffect(() => {
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeWalletModal();
-      }
-    };
-
-    window.addEventListener("keydown", handleEscapeKey);
-    return () => {
-      window.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, []);
 
   return (
     <>
@@ -49,49 +25,25 @@ export function Header({ toggleMobileMenu }: HeaderProps) {
           
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/">
-              <a className={`font-medium ${location === "/" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
-                Dashboard
-              </a>
+            <Link href="/" className={`font-medium ${location === "/" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
+              Dashboard
             </Link>
-            <Link href="/pools">
-              <a className={`font-medium ${location === "/pools" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
-                Pools
-              </a>
+            <Link href="/pools" className={`font-medium ${location === "/pools" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
+              Pools
             </Link>
-            <Link href="/swap">
-              <a className={`font-medium ${location === "/swap" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
-                Swap
-              </a>
+            <Link href="/swap" className={`font-medium ${location === "/swap" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
+              Swap
             </Link>
-            <Link href="/docs">
-              <a className={`font-medium ${location === "/docs" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
-                Docs
-              </a>
+            <Link href="/docs" className={`font-medium ${location === "/docs" ? "text-orange-500" : "text-gray-700 hover:text-orange-500"} transition-colors`}>
+              Docs
             </Link>
           </nav>
           
           {/* Wallet Connect */}
-          <div>
-            {address ? (
-              <Button 
-                variant="outline" 
-                className="hidden md:flex items-center gap-2 border-orange-200"
-                onClick={openWalletModal}
-              >
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="font-mono text-sm truncate max-w-[120px]">
-                  {address.slice(0, 6)}...{address.slice(-4)}
-                </span>
-              </Button>
-            ) : (
-              <Button 
-                className="hidden md:block bg-gradient-to-r from-red-500 to-orange-500 hover:opacity-90 text-white"
-                onClick={openWalletModal}
-              >
-                Connect Wallet
-              </Button>
-            )}
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              <ConnectWallet />
+            </div>
             <Button 
               variant="ghost" 
               size="icon" 
@@ -106,11 +58,6 @@ export function Header({ toggleMobileMenu }: HeaderProps) {
           </div>
         </div>
       </header>
-
-      {/* Wallet Connect Modal */}
-      {showWalletModal && (
-        <WalletConnect onClose={closeWalletModal} />
-      )}
     </>
   );
 }
