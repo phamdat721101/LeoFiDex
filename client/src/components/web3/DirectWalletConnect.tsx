@@ -325,7 +325,7 @@ export function DirectWalletConnect({
       });
       
       // Send signature to server for verification
-      await apiRequest('/api/users/profile', {
+      await apiRequest<{ user: any }>('/api/users/profile', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${signature}`

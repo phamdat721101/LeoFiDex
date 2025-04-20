@@ -142,7 +142,7 @@ export function Web3Provider({ children }: Web3ProviderProps) {
       
       // Authenticate with backend
       try {
-        const { auth } = await apiRequest<{ auth: { message: string } }>('/api/users/login', {
+        const response = await apiRequest<{ user: any; auth: { message: string, timestamp: number } }>('/api/users/login', {
           method: 'POST',
           body: JSON.stringify({
             address: accounts[0],
@@ -150,6 +150,8 @@ export function Web3Provider({ children }: Web3ProviderProps) {
             chainId
           })
         });
+        
+        const { auth } = response;
         
         const signature = await window.ethereum.request({
           method: 'personal_sign',
@@ -378,11 +380,8 @@ export function Web3Provider({ children }: Web3ProviderProps) {
     if (!state.isConnected) return null;
     
     try {
-      const response = await apiRequest('/api/users/actions', {
+      const response = await apiRequest<{ action: any }>('/api/users/actions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           address: state.address,
           actionType,
@@ -392,7 +391,7 @@ export function Web3Provider({ children }: Web3ProviderProps) {
         }),
       });
       
-      return response;
+      return response.action;
     } catch (error) {
       console.error('Failed to record action', error);
       return null;

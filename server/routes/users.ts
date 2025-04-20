@@ -12,20 +12,53 @@ import { ethers } from 'ethers';
 // Create router
 const router = Router();
 
-// Verify signature for authentication
-function verifySignature(address: string, message: string, signature: string): boolean {
-  try {
-    const recoveredAddress = ethers.verifyMessage(message, signature);
-    return recoveredAddress.toLowerCase() === address.toLowerCase();
-  } catch (error) {
-    console.error('Error verifying signature:', error);
-    return false;
-  }
-}
+import { 
+  generateAuthMessage, 
+  verifySignature, 
+  authenticateUser as authService,
+  verifyAuthToken
+} from '../services/auth';
 
 // Middleware to authenticate user by wallet signature
 async function authenticateUser(req: any, res: any, next: any) {
   try {
+    // Check if we have Authorization header (Bearer token)
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      // Extract token (signature)
+      const token = authHeader.substring(7);
+      const address = req.query.address || req.body.address;
+      
+      if (!address) {
+        return res.status(400).json({ error: 'Address is required' });
+      }
+      
+      // Verify token is valid for this address
+      const isValid = verifyAuthToken(token, address);
+      
+      if (!isValid) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+      }
+      
+      // Get or create user
+      const user = await authService(
+        address, 
+        req.body.walletType || 'unknown', 
+        req.body.chainId || 1
+      );
+      
+      if (!user) {
+        return res.status(500).json({ error: 'Failed to authenticate user' });
+      }
+      
+      // Attach user to request
+      req.user = user;
+      next();
+      return;
+    }
+    
+    // If no Authorization header, check for direct signature in body
     const { address, signature } = req.body;
     
     if (!address || !signature) {
@@ -37,11 +70,10 @@ async function authenticateUser(req: any, res: any, next: any) {
     const now = Math.floor(Date.now() / 1000);
     const fiveMinutesAgo = now - 300; // 5 minutes in seconds
     
-    // The message format should be: "Login to LeoFi: {timestamp}"
     // Try all timestamps within the last 5 minutes
     let isValid = false;
     for (let timestamp = now; timestamp >= fiveMinutesAgo; timestamp--) {
-      const message = `Login to LeoFi: ${timestamp}`;
+      const message = generateAuthMessage(address, timestamp);
       if (verifySignature(address, message, signature)) {
         isValid = true;
         break;
@@ -52,20 +84,15 @@ async function authenticateUser(req: any, res: any, next: any) {
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
-    // Check if user exists, if not create a new user
-    let user = await getUserByAddress(address);
+    // Authenticate user
+    const user = await authService(
+      address, 
+      req.body.walletType || 'unknown', 
+      req.body.chainId || 1
+    );
     
     if (!user) {
-      // Get wallet type and chain ID from the request
-      const { walletType = 'unknown', chainId = 1 } = req.body;
-      user = await createUser(address, walletType, chainId);
-      
-      if (!user) {
-        return res.status(500).json({ error: 'Failed to create user' });
-      }
-    } else {
-      // Update last login time
-      await updateUserLogin(address);
+      return res.status(500).json({ error: 'Failed to authenticate user' });
     }
 
     // Attach user to request
@@ -86,23 +113,20 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Address is required' });
     }
 
-    // Check if user exists, if not create a new user
-    let user = await getUserByAddress(address);
+    // Authenticate the user (create if doesn't exist)
+    const user = await authService(
+      address, 
+      walletType || 'unknown', 
+      chainId || 1
+    );
     
     if (!user) {
-      user = await createUser(address, walletType || 'unknown', chainId || 1);
-      
-      if (!user) {
-        return res.status(500).json({ error: 'Failed to create user' });
-      }
-    } else {
-      // Update last login time
-      await updateUserLogin(address);
+      return res.status(500).json({ error: 'Authentication failed' });
     }
 
-    // Generate nonce for the user to sign
+    // Generate message for the user to sign
     const timestamp = Math.floor(Date.now() / 1000);
-    const message = `Login to LeoFi: ${timestamp}`;
+    const message = generateAuthMessage(address, timestamp);
 
     res.json({ 
       user, 
@@ -193,6 +217,25 @@ router.get('/actions', authenticateUser, async (req: any, res) => {
   } catch (error) {
     console.error('Error getting actions:', error);
     res.status(500).json({ error: 'Failed to get actions' });
+  }
+});
+
+// Verify token validity
+router.get('/verify-token', async (req, res) => {
+  try {
+    const token = req.query.token as string;
+    const address = req.query.address as string;
+    
+    if (!token || !address) {
+      return res.status(400).json({ error: 'Token and address are required' });
+    }
+    
+    const isValid = verifyAuthToken(token, address);
+    
+    res.json({ valid: isValid });
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    res.status(500).json({ error: 'Failed to verify token' });
   }
 });
 
