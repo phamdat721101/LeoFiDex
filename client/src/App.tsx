@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { MobileMenu } from "@/components/layout/MobileMenu";
+import { MobileMenu } from "@/components/layout/MobileMenu.new";
 import { Web3Provider } from "@/components/web3/Web3Provider.simple";
 import Dashboard from "@/pages/Dashboard";
 import Pools from "@/pages/Pools";

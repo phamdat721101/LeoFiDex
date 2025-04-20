@@ -1,8 +1,7 @@
 import { Link } from "wouter";
-import { useWallet } from "@/hooks/useWallet";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { WalletConnect } from "@/components/web3/WalletConnect";
+import { useState, useEffect } from "react";
+import { DirectWalletConnect } from "@/components/web3/DirectWalletConnect";
 
 export function MobileMenu() {
   const { address } = useWallet();

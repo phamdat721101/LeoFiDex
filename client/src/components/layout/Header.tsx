@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ConnectWallet } from "@/components/web3/ConnectWallet";
+import { DirectWalletConnect } from "@/components/web3/DirectWalletConnect";
 import { LeoFiLogo } from "@/lib/leofi-logo";
 
 interface HeaderProps {
@@ -42,7 +42,7 @@ export function Header({ toggleMobileMenu }: HeaderProps) {
           {/* Wallet Connect */}
           <div className="flex items-center gap-4">
             <div className="hidden md:block">
-              <ConnectWallet />
+              <DirectWalletConnect />
             </div>
             <Button 
               variant="ghost" 
