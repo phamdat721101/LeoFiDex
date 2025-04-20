@@ -1,7 +1,7 @@
-// Network parameters for supported chains
+// Network parameters
 export const NETWORK_PARAMS: { 
-  [chainId: number]: { 
-    chainName: string;
+  [chainId: number]: {
+    name: string;
     nativeCurrency: {
       name: string;
       symbol: string;
@@ -9,111 +9,91 @@ export const NETWORK_PARAMS: {
     };
     rpcUrls: string[];
     blockExplorerUrls: string[];
-  } 
+  }
 } = {
   1: {
-    chainName: "Ethereum",
+    name: 'Ethereum Mainnet',
     nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
+      name: 'Ether',
+      symbol: 'ETH',
       decimals: 18
     },
-    rpcUrls: ["https://mainnet.infura.io/v3/"],
-    blockExplorerUrls: ["https://etherscan.io"]
-  },
-  3: {
-    chainName: "Ropsten",
-    nativeCurrency: {
-      name: "Ropsten Ether",
-      symbol: "ETH",
-      decimals: 18
-    },
-    rpcUrls: ["https://ropsten.infura.io/v3/"],
-    blockExplorerUrls: ["https://ropsten.etherscan.io"]
-  },
-  4: {
-    chainName: "Rinkeby",
-    nativeCurrency: {
-      name: "Rinkeby Ether",
-      symbol: "ETH",
-      decimals: 18
-    },
-    rpcUrls: ["https://rinkeby.infura.io/v3/"],
-    blockExplorerUrls: ["https://rinkeby.etherscan.io"]
+    rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+    blockExplorerUrls: ['https://etherscan.io']
   },
   5: {
-    chainName: "Goerli",
+    name: 'Goerli Test Network',
     nativeCurrency: {
-      name: "Goerli Ether",
-      symbol: "ETH",
+      name: 'Goerli Ether',
+      symbol: 'ETH',
       decimals: 18
     },
-    rpcUrls: ["https://goerli.infura.io/v3/"],
-    blockExplorerUrls: ["https://goerli.etherscan.io"]
-  },
-  10: {
-    chainName: "Optimism",
-    nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18
-    },
-    rpcUrls: ["https://mainnet.optimism.io"],
-    blockExplorerUrls: ["https://optimistic.etherscan.io"]
-  },
-  42: {
-    chainName: "Kovan",
-    nativeCurrency: {
-      name: "Kovan Ether",
-      symbol: "ETH",
-      decimals: 18
-    },
-    rpcUrls: ["https://kovan.infura.io/v3/"],
-    blockExplorerUrls: ["https://kovan.etherscan.io"]
-  },
-  56: {
-    chainName: "Binance Smart Chain",
-    nativeCurrency: {
-      name: "Binance Chain Native Token",
-      symbol: "BNB",
-      decimals: 18
-    },
-    rpcUrls: ["https://bsc-dataseed.binance.org"],
-    blockExplorerUrls: ["https://bscscan.com"]
+    rpcUrls: ['https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+    blockExplorerUrls: ['https://goerli.etherscan.io']
   },
   137: {
-    chainName: "Polygon",
+    name: 'Polygon Mainnet',
     nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
+      name: 'MATIC',
+      symbol: 'MATIC',
       decimals: 18
     },
-    rpcUrls: ["https://polygon-rpc.com"],
-    blockExplorerUrls: ["https://polygonscan.com"]
+    rpcUrls: ['https://polygon-rpc.com'],
+    blockExplorerUrls: ['https://polygonscan.com']
   },
-  42161: {
-    chainName: "Arbitrum",
+  80001: {
+    name: 'Mumbai Testnet',
     nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
+      name: 'MATIC',
+      symbol: 'MATIC',
       decimals: 18
     },
-    rpcUrls: ["https://arb1.arbitrum.io/rpc"],
-    blockExplorerUrls: ["https://arbiscan.io"]
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com']
+  },
+  56: {
+    name: 'BNB Smart Chain',
+    nativeCurrency: {
+      name: 'BNB',
+      symbol: 'BNB',
+      decimals: 18
+    },
+    rpcUrls: ['https://bsc-dataseed1.binance.org'],
+    blockExplorerUrls: ['https://bscscan.com']
   },
   43114: {
-    chainName: "Avalanche",
+    name: 'Avalanche C-Chain',
     nativeCurrency: {
-      name: "Avalanche",
-      symbol: "AVAX",
+      name: 'Avalanche',
+      symbol: 'AVAX',
       decimals: 18
     },
-    rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
-    blockExplorerUrls: ["https://snowtrace.io"]
+    rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
+    blockExplorerUrls: ['https://snowtrace.io']
+  },
+  42161: {
+    name: 'Arbitrum One',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+    blockExplorerUrls: ['https://arbiscan.io']
+  },
+  10: {
+    name: 'Optimism',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    rpcUrls: ['https://mainnet.optimism.io'],
+    blockExplorerUrls: ['https://optimistic.etherscan.io']
   }
 };
 
-// Contract addresses for supported chains
+// Contracts by network
 export const CONTRACTS: {
   [chainId: number]: {
     factory: string;
@@ -121,74 +101,53 @@ export const CONTRACTS: {
     moduleRegistry: string;
   }
 } = {
-  // Mainnet
   1: {
-    factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984", // Example address, would use real deployment
-    router: "0xE592427A0AEce92De3Edee1F18E0157C05861564", // Example address, would use real deployment
-    moduleRegistry: "0x3Ffe34cE5dCf54B38C324e0BaE7C47eb8E010270" // Example address, would use real deployment
+    factory: '0x1F98431c8aD98523631AE4a59f267346ea31F984', // Uniswap v3 factory on mainnet
+    router: '0xE592427A0AEce92De3Edee1F18E0157C05861564', // Uniswap v3 router on mainnet
+    moduleRegistry: '0x0000000000000000000000000000000000000000' // Placeholder
   },
-  // Polygon
+  5: {
+    factory: '0x1F98431c8aD98523631AE4a59f267346ea31F984', // Uniswap v3 factory on goerli
+    router: '0xE592427A0AEce92De3Edee1F18E0157C05861564', // Uniswap v3 router on goerli
+    moduleRegistry: '0x0000000000000000000000000000000000000000' // Placeholder
+  },
   137: {
-    factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984", // Example address, would use real deployment
-    router: "0xE592427A0AEce92De3Edee1F18E0157C05861564", // Example address, would use real deployment
-    moduleRegistry: "0x3Ffe34cE5dCf54B38C324e0BaE7C47eb8E010270" // Example address, would use real deployment
-  },
-  // Optimism
-  10: {
-    factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984", // Example address, would use real deployment
-    router: "0xE592427A0AEce92De3Edee1F18E0157C05861564", // Example address, would use real deployment
-    moduleRegistry: "0x3Ffe34cE5dCf54B38C324e0BaE7C47eb8E010270" // Example address, would use real deployment
-  },
-  // Arbitrum
-  42161: {
-    factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984", // Example address, would use real deployment
-    router: "0xE592427A0AEce92De3Edee1F18E0157C05861564", // Example address, would use real deployment
-    moduleRegistry: "0x3Ffe34cE5dCf54B38C324e0BaE7C47eb8E010270" // Example address, would use real deployment
+    factory: '0x1F98431c8aD98523631AE4a59f267346ea31F984', // Uniswap v3 factory on polygon
+    router: '0xE592427A0AEce92De3Edee1F18E0157C05861564', // Uniswap v3 router on polygon
+    moduleRegistry: '0x0000000000000000000000000000000000000000' // Placeholder
   }
 };
 
-// Fee tiers available for pools
+// Fee tiers
 export const FEE_TIERS = [
-  {
-    fee: 100, // 0.01%
-    label: "0.01%",
-    description: "Best for stable pairs"
-  },
-  {
-    fee: 500, // 0.05%
-    label: "0.05%",
-    description: "Best for stable pairs"
-  },
-  {
-    fee: 3000, // 0.3%
-    label: "0.3%",
-    description: "Best for most pairs"
-  },
-  {
-    fee: 10000, // 1%
-    label: "1%",
-    description: "Best for exotic pairs"
-  }
+  { value: 100, label: '0.01%' },
+  { value: 500, label: '0.05%' },
+  { value: 3000, label: '0.3%' },
+  { value: 10000, label: '1%' }
 ];
 
 // Module types
 export const MODULE_TYPES = {
-  FEE: 0,
-  ORACLE: 1,
-  RANGE_ORDER: 2,
-  GOVERNANCE: 3
+  fee: 'Fee',
+  oracle: 'Oracle',
+  rangeOrder: 'Range Order',
+  governance: 'Governance'
 };
 
-// Default slippage tolerance in percentage (0.5%)
+// Default slippage tolerance
 export const DEFAULT_SLIPPAGE_TOLERANCE = 0.5;
 
-// Default transaction deadline in minutes
+// Default transaction deadline (minutes)
 export const DEFAULT_TRANSACTION_DEADLINE = 20;
 
-// Block time in seconds (approximate)
+// Block time by network (seconds)
 export const BLOCK_TIME = {
-  1: 12, // Ethereum ~12 seconds
-  137: 2, // Polygon ~2 seconds
-  10: 0.5, // Optimism ~0.5 seconds
-  42161: 0.25 // Arbitrum ~0.25 seconds
+  1: 12, // Ethereum
+  5: 12, // Goerli
+  137: 2, // Polygon
+  80001: 2, // Mumbai
+  56: 3, // BSC
+  43114: 2, // Avalanche
+  42161: 0.25, // Arbitrum
+  10: 2 // Optimism
 };

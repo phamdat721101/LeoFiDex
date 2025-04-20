@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { Pool, Token, Transaction, Module } from "@shared/types";
+import usersRoutes from './routes/users';
+import dotenv from 'dotenv';
 
 // Mock data for demonstration purposes
 // In a real application, this would be fetched from a database or blockchain
@@ -190,8 +192,14 @@ function initMockData() {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Load environment variables
+  dotenv.config();
+
   // Initialize mock data
   initMockData();
+  
+  // Register user routes
+  app.use('/api/users', usersRoutes);
   
   // API endpoints
   app.get("/api/stats", (req, res) => {
